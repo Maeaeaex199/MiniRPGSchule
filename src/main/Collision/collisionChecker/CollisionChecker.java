@@ -12,7 +12,6 @@ public class CollisionChecker {
     }
 
     public void checkTile(entity.Entity entity) {
-        // Kollisionserkennung wird hier implementiert.
-        // Aktuell leer, damit der Build nicht blockiert.
+
     }
 }
