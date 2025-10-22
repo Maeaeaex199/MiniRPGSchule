@@ -1,6 +1,7 @@
 package main;// Java
 import javax.swing.*;
 import gamePanel.GamePanel;
+import org.example.menu.MenuHandler;
 
 import java.io.IOException;
 
@@ -11,6 +12,9 @@ public class Main {
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             window.setResizable(false);
             window.setTitle("HugeCocknBalls");
+
+            MenuHandler menuHandler = new MenuHandler();
+            menuHandler.mainmenu();
 
             GamePanel gamePanel = null;
             try {

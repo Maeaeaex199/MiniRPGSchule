@@ -2,11 +2,9 @@ package org.example.menu;
 
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MenuHandler {
-    public static void main(String[] args) {
+    public void mainmenu() {
         // Hauptfenster erstellen
         JFrame frame = new JFrame("Spiel-Menü");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
