@@ -4,7 +4,7 @@ package org.example.menu;
 import javax.swing.*;
 
 public class MenuHandler {
-    public void mainmenu() {
+    public JMenuBar mainmenu() {
         // Hauptfenster erstellen
         JFrame frame = new JFrame("Spiel-Menü");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -27,10 +27,6 @@ public class MenuHandler {
         spielMenu.addSeparator();
         spielMenu.add(beendenItem);
 
-        // Untermenüpunkte für "Einstellungen" erstellen
-        JMenuItem schwierigkeitItem = new JMenuItem("Schwierigkeit");
-        einstellungenMenu.add(schwierigkeitItem);
-
         // Untermenüpunkte für "Hilfe" erstellen
         JMenuItem anleitungItem = new JMenuItem("Anleitung");
         hilfeMenu.add(anleitungItem);
@@ -51,8 +47,6 @@ public class MenuHandler {
         });
 
         // Menüleiste zum Frame hinzufügen
-        frame.setJMenuBar(menuBar);
-
-        frame.setVisible(true);
+        return menuBar;
     }
 }

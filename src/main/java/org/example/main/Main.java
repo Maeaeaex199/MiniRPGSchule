@@ -8,13 +8,10 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame window = new JFrame();
-            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            window.setResizable(false);
-            window.setTitle("HugeCocknBalls");
 
             MenuHandler menuHandler = new MenuHandler();
-            menuHandler.mainmenu();
+
+
 
             GamePanel gamePanel = null;
             try {
@@ -22,9 +19,17 @@ public class Main {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+
+            JFrame window = new JFrame();
+            window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            window.setResizable(false);
+            window.setTitle("HugeCocknBalls");
+
             window.add(gamePanel);
             window.pack();
             window.setLocationRelativeTo(null);
+            window.setJMenuBar(menuHandler.mainmenu());
             window.setVisible(true);
 
             // Sicherstellen, dass KeyListener Events erhält
