@@ -2,6 +2,7 @@ package gamePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 import collisionChecker.CollisionChecker;
 import entity.Player;
@@ -26,7 +27,7 @@ public class GamePanel extends JPanel implements Runnable {
     int FPS = 60;
 
 
-    TileManager tileM = new TileManager(this);
+    public TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
     public CollisionChecker cChecker = new CollisionChecker(this);
@@ -37,7 +38,7 @@ public class GamePanel extends JPanel implements Runnable {
     int playerY = 100;
     int playerSpeed = 5;
 
-    public GamePanel() {
+    public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
@@ -85,6 +86,6 @@ public class GamePanel extends JPanel implements Runnable {
         tileM.draw(g2);
         player.draw(g2);
 
-        // Do not dispose the Graphics object provided by Swing
+
     }
 }

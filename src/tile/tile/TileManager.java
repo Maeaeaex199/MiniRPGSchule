@@ -6,8 +6,8 @@ import java.awt.*;
 
 public class TileManager {
     GamePanel gp;
-    Tile[] tile;
-    int[][] mapTileNum;
+    public tile.Tile[] tile;
+    public int[][] mapTileNum;
 
     public TileManager(GamePanel gp) {
         this.gp = gp;
@@ -81,6 +81,7 @@ public void getTileImage() {
 
     // Beispiel: Kollision für bestimmte Tiles setzen (falls benötigt)
     if (tile.length > 1) tile[1].collision = true; // wall
+    if (tile.length > 2) tile[2].collision = true; // water
     if (tile.length > 4) tile[4].collision = true; // tree
 }
 

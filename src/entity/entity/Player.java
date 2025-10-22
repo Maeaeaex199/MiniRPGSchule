@@ -32,8 +32,8 @@ public class Player extends Entity {
         solidArea = new Rectangle();
         solidArea.x = 0;
         solidArea.y = 0;
-        solidArea.width = gp.tileSize;
-        solidArea.height = gp.tileSize;
+        solidArea.width = gp.tileSize/2;
+        solidArea.height = gp.tileSize/2;
 
         setDefaultValues();
         getPlayerImage();
@@ -42,12 +42,14 @@ public class Player extends Entity {
         worldX = gp.tileSize * 10;
         worldY = gp.tileSize * 8;
         speed = 5;
-        direction = "down";
+        direction = "neutral";
     }
 
 
     public void getPlayerImage() {
         try {
+            neutral = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/run/up/player_run_up1.png")));
+
             up1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/run/up/player_run_up1.png")));
             up2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/run/up/player_run_up2.png")));
             up3 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/run/up/player_run_up3.png")));
@@ -92,18 +94,38 @@ public class Player extends Entity {
     public void update() {
         if (keyH.upPressed) {
             direction = "up";
-            worldY -= speed;
+
         } else if (keyH.downPressed) {
             direction = "down";
-            worldY += speed;
+
         } else if (keyH.leftPressed) {
             direction = "left";
-            worldX -= speed;
+
         } else if (keyH.rightPressed) {
             direction = "right";
-            worldX += speed;
+
+        } else {
+            direction = "neutral";
         }
         collisionOn = false;
+        gp.cChecker.checkTile(this);
+
+        if (!collisionOn) {
+            switch (direction) {
+                case "up":
+                    worldY -= speed;
+                    break;
+                case "down":
+                    worldY += speed;
+                    break;
+                case "left":
+                    worldX -= speed;
+                    break;
+                case "right":
+                    worldX += speed;
+                    break;
+            }
+        }
 
     }
     public void draw(Graphics2D g2) {
@@ -124,6 +146,9 @@ public class Player extends Entity {
                 break;
             case "right":
                 image = right1;
+                break;
+            case "neutral":
+                image = neutral;
                 break;
         }
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);

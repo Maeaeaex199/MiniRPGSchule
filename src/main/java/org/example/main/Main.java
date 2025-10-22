@@ -2,6 +2,8 @@ package main;// Java
 import javax.swing.*;
 import gamePanel.GamePanel;
 
+import java.io.IOException;
+
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -10,7 +12,12 @@ public class Main {
             window.setResizable(false);
             window.setTitle("HugeCocknBalls");
 
-            GamePanel gamePanel = new GamePanel();
+            GamePanel gamePanel = null;
+            try {
+                gamePanel = new GamePanel();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             window.add(gamePanel);
             window.pack();
             window.setLocationRelativeTo(null);
