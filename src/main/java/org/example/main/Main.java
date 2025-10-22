@@ -24,7 +24,7 @@ public class Main {
             JFrame window = new JFrame();
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             window.setResizable(false);
-            window.setTitle("HugeCocknBalls");
+            window.setTitle("Hairy&HugeCockNBalls");
 
             window.add(gamePanel);
             window.pack();
