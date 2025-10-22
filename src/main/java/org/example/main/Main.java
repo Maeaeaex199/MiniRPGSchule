@@ -35,6 +35,7 @@ public class Main {
             // Sicherstellen, dass KeyListener Events erhält
             gamePanel.requestFocusInWindow();
 
+            gamePanel.setupGame();
             // Gameloop starten
             gamePanel.startGameThread();
         });
