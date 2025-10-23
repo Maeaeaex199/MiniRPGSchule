@@ -1,7 +1,7 @@
 package main;// Java
 import javax.swing.*;
 import gamePanel.GamePanel;
-import org.example.menu.MenuHandler;
+import menu.MenuHandler;
 
 import java.io.IOException;
 
@@ -11,8 +11,6 @@ public class Main {
 
             MenuHandler menuHandler = new MenuHandler();
 
-
-
             GamePanel gamePanel = null;
             try {
                 gamePanel = new GamePanel();
@@ -20,6 +18,8 @@ public class Main {
                 throw new RuntimeException(e);
             }
 
+            // GamePanel-Referenz für Menü setzen
+            menuHandler.setGamePanel(gamePanel);
 
             JFrame window = new JFrame();
             window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

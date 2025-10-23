@@ -1,4 +1,4 @@
-package org.example.main;
+package main;
 import gamePanel.GamePanel;
 import object.OBJ_Chest;
 import object.OBJ_Door;
