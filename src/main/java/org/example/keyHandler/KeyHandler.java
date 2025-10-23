@@ -5,7 +5,8 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener {
     public boolean upPressed, downPressed, leftPressed, rightPressed, escapePressed;
-    public boolean interactPressed; // NEU: für Interaktion mit Objekten
+    public boolean interactPressed; // für Interaktion mit Objekten
+    public boolean inventoryPressed; // NEU: für Inventar öffnen
 
     public KeyHandler() {
         // Keine GamePanel-Abhängigkeit notwendig
@@ -32,8 +33,11 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_RIGHT) {
             rightPressed = true;
         }
-        if (code == KeyEvent.VK_SPACE) { // NEU: E für Interaktion
+        if (code == KeyEvent.VK_SPACE) {
             interactPressed = true;
+        }
+        if (code == KeyEvent.VK_PAGE_DOWN) { // NEU: Page Down für Inventar
+            inventoryPressed = true;
         }
     }
 
@@ -55,8 +59,11 @@ public class KeyHandler implements KeyListener {
         if (code == KeyEvent.VK_RIGHT) {
             rightPressed = false;
         }
-        if (code == KeyEvent.VK_SPACE) { // NEU
+        if (code == KeyEvent.VK_SPACE) {
             interactPressed = false;
+        }
+        if (code == KeyEvent.VK_PAGE_DOWN) { // NEU
+            inventoryPressed = false;
         }
     }
 }

@@ -1,9 +1,10 @@
 package entity;
 
-
 import entity.Entity;
 import gamePanel.GamePanel;
 import keyHandler.KeyHandler;
+import inventory.Inventory;
+import ui.InventoryUI;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -12,20 +13,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
-
 public class Player extends Entity {
     GamePanel gp;
     KeyHandler keyH;
+    
+    // Inventar hinzufügen
+    private Inventory inventory;
 
     public final int screenX;
     public final int screenY;
     public int hasKey = 0;
 
-
-
     public Player(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
         this.keyH = keyH;
+        
+        // Inventar mit 20 Slots initialisieren
+        this.inventory = new Inventory(20);
 
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
@@ -41,13 +45,18 @@ public class Player extends Entity {
         setDefaultValues();
         getPlayerImage();
     }
+    
+    // Getter für das Inventar
+    public Inventory getInventory() {
+        return inventory;
+    }
+    
     public void setDefaultValues() {
         worldX = gp.tileSize * 38;
         worldY = gp.tileSize * 9;
         speed = 5;
         direction = "neutral";
     }
-
 
     public void getPlayerImage() {
         try {
@@ -91,25 +100,21 @@ public class Player extends Entity {
         } catch(IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void update() {
         if (keyH.upPressed) {
             direction = "up";
-
         } else if (keyH.downPressed) {
             direction = "down";
-
         } else if (keyH.leftPressed) {
             direction = "left";
-
         } else if (keyH.rightPressed) {
             direction = "right";
-
         } else {
             direction = "neutral";
         }
+        
         collisionOn = false;
         gp.cChecker.checkTile(this);
 
@@ -132,7 +137,6 @@ public class Player extends Entity {
                     break;
             }
         }
-
     }
 
     public void pickupObject(int i) {
@@ -140,25 +144,34 @@ public class Player extends Entity {
             String objectName = gp.obj[i].name;
             switch (objectName) {
                 case "Key":
-                    hasKey++;
-                    gp.obj[i] = null;
+                    if (inventory.addItem("Key", 1)) {
+                        gp.obj[i] = null;
+                        hasKey++; // Für Rückwärtskompatibilität
+                        System.out.println("Schlüssel aufgehoben! Inventar: " + inventory.getItemQuantity("Key"));
+                    } else {
+                        System.out.println("Inventar ist voll!");
+                    }
                     break;
                 case "Door":
-                    if (hasKey > 0) {
+                    if (inventory.hasItem("Key")) {
                         gp.obj[i] = null;
-                        hasKey--;
+                        inventory.removeItem("Key", 1);
+                        hasKey--; // Für Rückwärtskompatibilität
+                        System.out.println("Tür geöffnet! Verbleibende Schlüssel: " + inventory.getItemQuantity("Key"));
+                    } else {
+                        System.out.println("Du brauchst einen Schlüssel!");
                     }
                     break;
                 case "Chest":
+                    // Kisten können NICHT mehr aufgesammelt werden
+                    // Sie können nur noch mit SPACE geöffnet werden
+                    System.out.println("Drücke SPACE um die Truhe zu öffnen");
                     break;
             }
         }
     }
 
     public void draw(Graphics2D g2) {
-        /*g2.setColor(Color.WHITE);
-        g2.fillRect(x, y, gp.tileSize, gp.tileSize);*/
-
         BufferedImage image = null;
 
         switch(direction) {
@@ -179,5 +192,26 @@ public class Player extends Entity {
                 break;
         }
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+        
+        // Inventar-Status anzeigen (optional, nur wenn nicht das komplette UI offen ist)
+        if (!gp.getInventoryUI().isOpen()) {
+            drawInventoryStatus(g2);
+        }
+    }
+    
+    private void drawInventoryStatus(Graphics2D g2) {
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+        g2.drawString("Inventar: " + inventory.getUsedSlots() + "/" + inventory.getMaxSlots(), 10, 30);
+        
+        // Zeige Schlüssel an
+        if (inventory.hasItem("Key")) {
+            g2.drawString("Schlüssel: " + inventory.getItemQuantity("Key"), 10, 50);
+        }
+        
+        // Hinweis für Inventar
+        g2.setColor(Color.YELLOW);
+        g2.setFont(new Font("Arial", Font.PLAIN, 12));
+        g2.drawString("PG_DOWN für Inventar", 10, 70);
     }
 }

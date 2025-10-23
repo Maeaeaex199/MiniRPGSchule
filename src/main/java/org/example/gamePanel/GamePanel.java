@@ -11,6 +11,7 @@ import object.SuperObject;
 import object.OBJ_Chest;
 import main.AssetSetter;
 import tile.TileManager;
+import ui.InventoryUI;
 
 public class GamePanel extends JPanel implements Runnable {
     final int originalTileSize = 8;
@@ -46,6 +47,8 @@ public class GamePanel extends JPanel implements Runnable {
     // === INVENTAR-SYSTEM ===
     private OBJ_Chest currentChest = null;
     private boolean prevInteractPressed = false;
+    private InventoryUI inventoryUI = new InventoryUI(); // NEU
+    private boolean prevInventoryPressed = false; // NEU
 
     // These fields are currently unused; keep or remove as needed.
     int playerX = 100;
@@ -58,6 +61,11 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+    }
+
+    // Getter für InventoryUI
+    public InventoryUI getInventoryUI() {
+        return inventoryUI;
     }
 
     public void setupGame() {
@@ -87,8 +95,11 @@ public class GamePanel extends JPanel implements Runnable {
                 // Chest-Interaktion prüfen
                 handleChestInteraction();
 
+                // Inventar-Toggle prüfen (NEU)
+                handleInventoryToggle();
+
                 // Nur updaten wenn nicht pausiert und kein Inventar offen
-                if (!paused && !isAnyChestOpen()) {
+                if (!paused && !isAnyChestOpen() && !inventoryUI.isOpen()) {
                     update();
                 }
 
@@ -104,6 +115,20 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
+    // === INVENTAR-HANDLING (NEU) ===
+    private void handleInventoryToggle() {
+        boolean inventoryPressed = keyH.inventoryPressed;
+
+        if (inventoryPressed && !prevInventoryPressed) {
+            // Nur öffnen wenn kein Chest offen ist
+            if (!isAnyChestOpen()) {
+                inventoryUI.toggle();
+            }
+        }
+
+        prevInventoryPressed = inventoryPressed;
+    }
+
     // === PAUSE-HANDLING ===
     private void handlePauseToggle() {
         boolean escPressed = keyH.escapePressed;
@@ -113,8 +138,10 @@ public class GamePanel extends JPanel implements Runnable {
         if (escPressed && !prevEscapePressed &&
                 (currentTime - lastPauseToggleTime) > PAUSE_COOLDOWN) {
 
-            // Wenn ein Inventar offen ist, schließe es statt zu pausieren
-            if (isAnyChestOpen()) {
+            // Priorität: 1. Inventar schließen, 2. Chest schließen, 3. Pausieren
+            if (inventoryUI.isOpen()) {
+                inventoryUI.close();
+            } else if (isAnyChestOpen()) {
                 closeAllChests();
             } else {
                 togglePause();
@@ -208,6 +235,9 @@ public class GamePanel extends JPanel implements Runnable {
         }
         player.draw(g2);
 
+        // === PLAYER-INVENTAR UI (NEU) ===
+        inventoryUI.draw(g2, player.getInventory(), screenWidth, screenHeight);
+
         // === CHEST-INVENTAR ===
         for (SuperObject object : obj) {
             if (object instanceof OBJ_Chest) {
@@ -249,7 +279,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         // === INTERAKTIONS-HILFE ===
-        if (!paused && !isAnyChestOpen()) {
+        if (!paused && !isAnyChestOpen() && !inventoryUI.isOpen()) {
             // Schaue nach naheliegenden Truhen für Interaktions-Hint
             for (SuperObject object : obj) {
                 if (object instanceof OBJ_Chest) {
@@ -268,7 +298,6 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         }
-
         g2.dispose();
     }
 }
