@@ -8,6 +8,7 @@ import collisionChecker.CollisionChecker;
 import entity.Player;
 import keyHandler.KeyHandler;
 import object.SuperObject;
+import object.OBJ_Chest;
 import main.AssetSetter;
 import tile.TileManager;
 
@@ -41,6 +42,10 @@ public class GamePanel extends JPanel implements Runnable {
     private boolean prevEscapePressed = false;
     private long lastPauseToggleTime = 0;
     private static final long PAUSE_COOLDOWN = 250; // Millisekunden
+
+    // === INVENTAR-SYSTEM ===
+    private OBJ_Chest currentChest = null;
+    private boolean prevInteractPressed = false;
 
     // These fields are currently unused; keep or remove as needed.
     int playerX = 100;
@@ -78,13 +83,16 @@ public class GamePanel extends JPanel implements Runnable {
             if (delta >= 1) {
                 // Pause-Toggle prüfen
                 handlePauseToggle();
-                
-                // Nur updaten wenn nicht pausiert
-                if (!paused) {
+
+                // Chest-Interaktion prüfen
+                handleChestInteraction();
+
+                // Nur updaten wenn nicht pausiert und kein Inventar offen
+                if (!paused && !isAnyChestOpen()) {
                     update();
                 }
-                
-                // Immer repainten (für Pause-Overlay)
+
+                // Immer repainten (für Overlays)
                 repaint();
                 delta--;
             } else {
@@ -100,15 +108,69 @@ public class GamePanel extends JPanel implements Runnable {
     private void handlePauseToggle() {
         boolean escPressed = keyH.escapePressed;
         long currentTime = System.currentTimeMillis();
-        
+
         // ESC gedrückt + nicht vorher gedrückt + Cooldown abgelaufen
-        if (escPressed && !prevEscapePressed && 
-            (currentTime - lastPauseToggleTime) > PAUSE_COOLDOWN) {
-            togglePause();
+        if (escPressed && !prevEscapePressed &&
+                (currentTime - lastPauseToggleTime) > PAUSE_COOLDOWN) {
+
+            // Wenn ein Inventar offen ist, schließe es statt zu pausieren
+            if (isAnyChestOpen()) {
+                closeAllChests();
+            } else {
+                togglePause();
+            }
             lastPauseToggleTime = currentTime;
         }
-        
+
         prevEscapePressed = escPressed;
+    }
+
+    // === CHEST-INTERAKTION ===
+    private void handleChestInteraction() {
+        boolean interactPressed = keyH.interactPressed;
+
+        if (interactPressed && !prevInteractPressed) {
+            // Schaue nach naheliegenden Truhen
+            checkChestInteraction();
+        }
+
+        prevInteractPressed = interactPressed;
+    }
+
+    private void checkChestInteraction() {
+        for (SuperObject object : obj) {
+            if (object instanceof OBJ_Chest) {
+                OBJ_Chest chest = (OBJ_Chest) object;
+
+                // Prüfe Entfernung zur Truhe
+                int distance = Math.abs(player.worldX - chest.worldX) +
+                        Math.abs(player.worldY - chest.worldY);
+
+                if (distance < tileSize * 2) { // Innerhalb von 2 Tiles
+                    chest.interact();
+                    currentChest = chest.isOpen() ? chest : null;
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean isAnyChestOpen() {
+        for (SuperObject object : obj) {
+            if (object instanceof OBJ_Chest && ((OBJ_Chest) object).isOpen()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void closeAllChests() {
+        for (SuperObject object : obj) {
+            if (object instanceof OBJ_Chest) {
+                ((OBJ_Chest) object).close();
+            }
+        }
+        currentChest = null;
     }
 
     public void togglePause() {
@@ -136,7 +198,7 @@ public class GamePanel extends JPanel implements Runnable {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        
+
         // Spielwelt zeichnen
         tileM.draw(g2);
         for (int i = 0; i < obj.length; i++) {
@@ -145,6 +207,16 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
         player.draw(g2);
+
+        // === CHEST-INVENTAR ===
+        for (SuperObject object : obj) {
+            if (object instanceof OBJ_Chest) {
+                OBJ_Chest chest = (OBJ_Chest) object;
+                if (chest.isOpen()) {
+                    chest.getInventory().drawInventoryUI(g2, screenWidth, screenHeight);
+                }
+            }
+        }
 
         // === PAUSE-OVERLAY ===
         if (paused) {
@@ -159,13 +231,13 @@ public class GamePanel extends JPanel implements Runnable {
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 36));
             FontMetrics fm = g2.getFontMetrics();
-            
+
             String pauseText = "PAUSIERT";
             int textWidth = fm.stringWidth(pauseText);
             int textX = (screenWidth - textWidth) / 2;
             int textY = screenHeight / 2 - 20;
             g2.drawString(pauseText, textX, textY);
-            
+
             // Anleitung
             g2.setFont(new Font("Arial", Font.PLAIN, 16));
             fm = g2.getFontMetrics();
@@ -174,6 +246,27 @@ public class GamePanel extends JPanel implements Runnable {
             int instrX = (screenWidth - instrWidth) / 2;
             int instrY = textY + 50;
             g2.drawString(instructionText, instrX, instrY);
+        }
+
+        // === INTERAKTIONS-HILFE ===
+        if (!paused && !isAnyChestOpen()) {
+            // Schaue nach naheliegenden Truhen für Interaktions-Hint
+            for (SuperObject object : obj) {
+                if (object instanceof OBJ_Chest) {
+                    int distance = Math.abs(player.worldX - object.worldX) +
+                            Math.abs(player.worldY - object.worldY);
+
+                    if (distance < tileSize * 2) {
+                        g2.setColor(Color.YELLOW);
+                        g2.setFont(new Font("Arial", Font.BOLD, 16));
+                        String hint = "E drücken zum Öffnen";
+                        FontMetrics fm = g2.getFontMetrics();
+                        int hintX = (screenWidth - fm.stringWidth(hint)) / 2;
+                        g2.drawString(hint, hintX, 50);
+                        break;
+                    }
+                }
+            }
         }
 
         g2.dispose();
