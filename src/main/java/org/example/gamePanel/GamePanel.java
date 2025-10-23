@@ -259,7 +259,7 @@ public class GamePanel extends JPanel implements Runnable {
                     if (distance < tileSize * 2) {
                         g2.setColor(Color.YELLOW);
                         g2.setFont(new Font("Arial", Font.BOLD, 16));
-                        String hint = "E drücken zum Öffnen";
+                        String hint = "SPACE drücken zum Öffnen";
                         FontMetrics fm = g2.getFontMetrics();
                         int hintX = (screenWidth - fm.stringWidth(hint)) / 2;
                         g2.drawString(hint, hintX, 50);
