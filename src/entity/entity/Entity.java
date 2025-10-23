@@ -12,8 +12,13 @@ public class Entity {
     public BufferedImage down1, down2, down3, down4, down5, down6, down7, down8;
     public BufferedImage left1, left2, left3, left4, left5, left6, left7, left8;
     public BufferedImage right1, right2, right3, right4, right5, right6, right7, right8;
-    public String direction;
-    public Rectangle solidArea;
+    
+    // WICHTIG: Default-Richtung
+    public String direction = "neutral";
+    
+    // WICHTIG: Kollisionsrechteck 
+    public Rectangle solidArea = new Rectangle(0, 0, 32, 32); // Default, wird in Unterklassen überschrieben
+    
     public int solidAreaDefaultX, solidAreaDefaultY;
     public boolean collisionOn = false;
 }

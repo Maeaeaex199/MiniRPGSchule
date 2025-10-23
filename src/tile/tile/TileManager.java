@@ -6,7 +6,7 @@ import java.awt.*;
 
 public class TileManager {
     GamePanel gp;
-    public tile.Tile[] tile;
+    public Tile[] tile;
     public int[][] mapTileNum;
 
     public TileManager(GamePanel gp) {
